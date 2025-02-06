@@ -2,7 +2,14 @@ import { z } from "zod";
 
 export const CustomPropertyValidationSchema = z.object({
   name: z.string().min(1, "Custom property name is required"),
-  type: z.enum(["text", "boolean", "multipleOptions", "url", "attachment"]),
+  type: z.enum([
+    "text",
+    "boolean",
+    "multipleOptions",
+    "url",
+    "attachment",
+    "richText",
+  ]),
   value: z.string().min(1, "Custom property value is required"),
 });
 

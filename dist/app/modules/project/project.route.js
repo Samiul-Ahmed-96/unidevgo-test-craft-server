@@ -8,6 +8,8 @@ const express_1 = __importDefault(require("express"));
 const project_controller_1 = require("./project.controller");
 const router = express_1.default.Router();
 router.get("/", project_controller_1.ProjectControllers.getAllProjects);
+// Fetch all projects under a company (requires companyId as query param)
+router.get("/company", project_controller_1.ProjectControllers.getAllProjectByCompany);
 router.get("/:projectId", project_controller_1.ProjectControllers.getSingleProject);
 router.post("/create-project", project_controller_1.ProjectControllers.createProject);
 router.delete("/:projectId", project_controller_1.ProjectControllers.deleteProject);

@@ -47,6 +47,34 @@ const getAllProjects = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Controller to fetch all modules under a project
+const getAllProjectByCompany = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { companyId } = req.query;
+
+    if (!companyId || typeof companyId !== "string") {
+      res.status(400).json({
+        success: false,
+        message: "Invalid or missing company id",
+      });
+      return;
+    }
+
+    const result = await ProjectService.getAllModulesByCompanyFromDB(companyId);
+
+    res.status(200).json({
+      success: true,
+      message: "Projects retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
+  }
+};
+
 // Controller to delete an project by ID
 const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -102,5 +130,6 @@ export const ProjectControllers = {
   createProject,
   getAllProjects,
   getSingleProject,
+  getAllProjectByCompany,
   deleteProject,
 };

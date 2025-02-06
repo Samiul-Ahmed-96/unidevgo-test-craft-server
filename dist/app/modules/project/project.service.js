@@ -19,6 +19,10 @@ const getAllProjectsFromDB = () => __awaiter(void 0, void 0, void 0, function* (
     const result = yield project_model_1.ProjectModel.find();
     return result;
 });
+// Fetch all modules under a project
+const getAllModulesByCompanyFromDB = (companyId) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield project_model_1.ProjectModel.find({ companyId });
+});
 const deleteProjectFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield project_model_1.ProjectModel.updateOne({ id }, { isDeleted: true });
     return result;
@@ -30,6 +34,7 @@ const getSingleProjectFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
 exports.ProjectService = {
     createProjectIntoDB,
     getAllProjectsFromDB,
+    getAllModulesByCompanyFromDB,
     getSingleProjectFromDB,
     deleteProjectFromDB,
 };

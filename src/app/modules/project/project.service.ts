@@ -11,6 +11,11 @@ const getAllProjectsFromDB = async () => {
   return result;
 };
 
+// Fetch all modules under a project
+const getAllModulesByCompanyFromDB = async (companyId: string) => {
+  return await ProjectModel.find({ companyId });
+};
+
 const deleteProjectFromDB = async (id: string) => {
   const result = await ProjectModel.updateOne({ id }, { isDeleted: true });
   return result;
@@ -24,6 +29,7 @@ const getSingleProjectFromDB = async (id: string) => {
 export const ProjectService = {
   createProjectIntoDB,
   getAllProjectsFromDB,
+  getAllModulesByCompanyFromDB,
   getSingleProjectFromDB,
   deleteProjectFromDB,
 };
