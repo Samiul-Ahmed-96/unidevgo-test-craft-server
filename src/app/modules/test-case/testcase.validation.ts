@@ -10,7 +10,7 @@ export const CustomPropertyValidationSchema = z.object({
     "attachment",
     "richText",
   ]),
-  value: z.string().min(1, "Custom property value is required"),
+  value: z.union([z.string(), z.null()]).optional(), // Ensure value is either a string (for attachments) or null
 });
 
 export const DefaultPropertiesValidationSchema = z.object({

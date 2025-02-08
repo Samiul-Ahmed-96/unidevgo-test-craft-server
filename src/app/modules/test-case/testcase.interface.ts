@@ -16,7 +16,7 @@ export type TDefaultProperties = {
   createdBy: string;
   testDescription: string;
   expectedResult: string;
-  status: "Passed" | "Failed" | "Blocked" | "Skipped"; // Modify as needed
+  status: "Passed" | "Failed" | "Blocked" | "Skipped" | "Not Yet Tested";
   executedDate: string; // Use `Date` if parsing is required
   updatedDate: string;
   considerAsBug: boolean;

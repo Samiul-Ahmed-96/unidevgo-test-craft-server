@@ -6,14 +6,23 @@ import { testCaseValidation } from "./testcase.validation";
 // Controller to create a new test case
 const createTestCase = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { testCase: testCaseData } = req.body;
+    let { testCase } = req.body;
 
-    // Validate and parse using Zod schema
-    const zodParseData =
-      testCaseValidation.TestCaseValidationSchema.parse(testCaseData);
+    // Validate test case data using Zod
+    const validatedData =
+      testCaseValidation.TestCaseValidationSchema.parse(testCase);
 
-    // Create the test case in the database
-    const result = await TestCaseService.createTestCaseIntoDB(zodParseData);
+    // If an attachment URL is provided, add it to customProperties
+    if (req.file) {
+      validatedData.customProperties.push({
+        name: "Attachment",
+        type: "attachment",
+        value: `/uploads/${req.file.filename}`,
+      });
+    }
+
+    // Create test case
+    const result = await TestCaseService.createTestCaseIntoDB(validatedData);
 
     res.status(201).json({
       success: true,
