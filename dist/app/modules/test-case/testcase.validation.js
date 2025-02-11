@@ -4,8 +4,15 @@ exports.testCaseValidation = exports.TestCaseValidationSchema = exports.DefaultP
 const zod_1 = require("zod");
 exports.CustomPropertyValidationSchema = zod_1.z.object({
     name: zod_1.z.string().min(1, "Custom property name is required"),
-    type: zod_1.z.enum(["text", "boolean", "multipleOptions", "url", "attachment"]),
-    value: zod_1.z.string().min(1, "Custom property value is required"),
+    type: zod_1.z.enum([
+        "text",
+        "boolean",
+        "multipleOptions",
+        "url",
+        "attachment",
+        "richText",
+    ]),
+    value: zod_1.z.union([zod_1.z.string(), zod_1.z.null()]).optional(), // Ensure value is either a string (for attachments) or null
 });
 exports.DefaultPropertiesValidationSchema = zod_1.z.object({
     createdBy: zod_1.z.string().min(1, "Created By is required"),

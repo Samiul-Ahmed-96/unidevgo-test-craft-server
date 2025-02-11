@@ -32,6 +32,7 @@ router.post("/upload-attachment", upload.single("file"), (req, res): void => {
 
 // Add Jira issue creation route
 router.post("/create-jira-issue", JiraController.createJiraIssue);
+router.get("/get-jira-projects", JiraController.getJiraProjects);
 router.get("/all", TestCaseControllers.getAllTestCases);
 // Fetch all test cases under a module (requires moduleId as query param)
 router.get("/", TestCaseControllers.getTestCasesByModule);

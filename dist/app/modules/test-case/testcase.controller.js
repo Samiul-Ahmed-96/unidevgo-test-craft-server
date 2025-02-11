@@ -15,11 +15,19 @@ const testcase_validation_1 = require("./testcase.validation");
 // Controller to create a new test case
 const createTestCase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { testCase: testCaseData } = req.body;
-        // Validate and parse using Zod schema
-        const zodParseData = testcase_validation_1.testCaseValidation.TestCaseValidationSchema.parse(testCaseData);
-        // Create the test case in the database
-        const result = yield testcase_service_1.TestCaseService.createTestCaseIntoDB(zodParseData);
+        let { testCase } = req.body;
+        // Validate test case data using Zod
+        const validatedData = testcase_validation_1.testCaseValidation.TestCaseValidationSchema.parse(testCase);
+        // If an attachment URL is provided, add it to customProperties
+        if (req.file) {
+            validatedData.customProperties.push({
+                name: "Attachment",
+                type: "attachment",
+                value: `/uploads/${req.file.filename}`,
+            });
+        }
+        // Create test case
+        const result = yield testcase_service_1.TestCaseService.createTestCaseIntoDB(validatedData);
         res.status(201).json({
             success: true,
             message: "Test Case Added successfully",
