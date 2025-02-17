@@ -29,6 +29,10 @@ const getAllModulesFromDB = (projectId) => __awaiter(void 0, void 0, void 0, fun
 const getSingleModuleFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield module_model_1.ModuleModel.findOne({ id });
 });
+// Update only the module name
+const updateModuleName = (id, newName) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield module_model_1.ModuleModel.updateOne({ id }, { $set: { name: newName } });
+});
 // Soft delete a module
 const deleteModuleFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield module_model_1.ModuleModel.updateOne({ id }, { isDeleted: true });
@@ -38,5 +42,6 @@ exports.ModuleService = {
     addSubmoduleToModule,
     getAllModulesFromDB,
     getSingleModuleFromDB,
+    updateModuleName,
     deleteModuleFromDB,
 };

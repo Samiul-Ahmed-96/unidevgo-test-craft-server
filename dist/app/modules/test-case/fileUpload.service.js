@@ -4,27 +4,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.upload = void 0;
+const fs_1 = __importDefault(require("fs"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
+// Ensure the uploads directory exists
+const uploadDir = path_1.default.join(process.cwd(), "uploads");
+if (!fs_1.default.existsSync(uploadDir)) {
+    fs_1.default.mkdirSync(uploadDir, { recursive: true });
+}
 // Set storage configuration
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); // Ensure this folder exists or create it dynamically
+        cb(null, uploadDir); // Save files in the 'uploads/' folder
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(null, uniqueSuffix + path_1.default.extname(file.originalname));
+        cb(null, uniqueSuffix + path_1.default.extname(file.originalname)); // Preserve file extension
     },
 });
-// File filter to allow only specific file types
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = ["image/png", "image/jpeg", "application/pdf"];
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    }
-    else {
-        cb(new Error("Invalid file type. Only PNG, JPEG, and PDF allowed."));
-    }
-};
-// Configure Multer
-exports.upload = (0, multer_1.default)({ storage, fileFilter });
+// No file filter - allowing all types of files
+const upload = (0, multer_1.default)({ storage });
+exports.upload = upload;

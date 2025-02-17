@@ -15,6 +15,8 @@ router.post("/:parentId/submodule", module_controller_1.ModuleControllers.addSub
 router.get("/", module_controller_1.ModuleControllers.getAllModules);
 // Fetch a single module by moduleId
 router.get("/:moduleId", module_controller_1.ModuleControllers.getSingleModule);
+// Update only the module name
+router.put("/:moduleId/name", module_controller_1.ModuleControllers.updateModuleName);
 // Soft delete a module by moduleId
 router.delete("/:moduleId", module_controller_1.ModuleControllers.deleteModule);
 exports.ModuleRoutes = router;

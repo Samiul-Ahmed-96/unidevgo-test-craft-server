@@ -117,11 +117,43 @@ const getSingleProject = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.send(error);
     }
 });
+// Controller to update an project's details
+const updateProject = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { projectId } = req.params;
+        const updateData = req.body;
+        // Check if update data is provided
+        if (!updateData) {
+            res.status(400).json({
+                success: false,
+                message: "No update data provided",
+            });
+            return;
+        }
+        const result = yield project_service_1.ProjectService.updateProjectInDB(projectId, updateData);
+        if (!result) {
+            res.status(404).json({
+                success: false,
+                message: "Project not found",
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            message: "Project updated successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        res.send(error);
+    }
+});
 // Export all controllers
 exports.ProjectControllers = {
     createProject,
     getAllProjects,
     getSingleProject,
     getAllProjectByCompany,
+    updateProject,
     deleteProject,
 };

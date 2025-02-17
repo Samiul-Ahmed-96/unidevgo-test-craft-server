@@ -31,10 +31,15 @@ const getSingleProjectFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
     const result = yield project_model_1.ProjectModel.findOne({ id });
     return result;
 });
+const updateProjectInDB = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield project_model_1.ProjectModel.findOneAndUpdate({ id }, { $set: updateData }, { new: true });
+    return result;
+});
 exports.ProjectService = {
     createProjectIntoDB,
     getAllProjectsFromDB,
     getAllModulesByCompanyFromDB,
     getSingleProjectFromDB,
+    updateProjectInDB,
     deleteProjectFromDB,
 };

@@ -18,7 +18,11 @@ const createTestCase = (req, res) => __awaiter(void 0, void 0, void 0, function*
         let { testCase } = req.body;
         // Validate test case data using Zod
         const validatedData = testcase_validation_1.testCaseValidation.TestCaseValidationSchema.parse(testCase);
-        // If an attachment URL is provided, add it to customProperties
+        // Ensure customProperties exists
+        if (!validatedData.customProperties) {
+            validatedData.customProperties = [];
+        }
+        // If an attachment is uploaded, add it to customProperties
         if (req.file) {
             validatedData.customProperties.push({
                 name: "Attachment",
@@ -186,6 +190,37 @@ const bulkDeleteTestCase = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 });
+// Controller to update an project's details
+const updateTestCase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { testCaseId } = req.params;
+        const updateData = req.body;
+        // Check if update data is provided
+        if (!updateData) {
+            res.status(400).json({
+                success: false,
+                message: "No update data provided",
+            });
+            return;
+        }
+        const result = yield testcase_service_1.TestCaseService.updateTestCaseInDB(testCaseId, updateData);
+        if (!result) {
+            res.status(404).json({
+                success: false,
+                message: "Test case not found",
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            message: "Test case updated successfully",
+            data: result,
+        });
+    }
+    catch (error) {
+        res.send(error);
+    }
+});
 // Export all controllers
 exports.TestCaseControllers = {
     createTestCase,
@@ -193,6 +228,7 @@ exports.TestCaseControllers = {
     getTestCasesByModule,
     updateTestCasesStatus,
     getSingleTestCase,
+    updateTestCase,
     deleteTestCase,
     bulkDeleteTestCase,
 };

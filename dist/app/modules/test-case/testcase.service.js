@@ -42,6 +42,10 @@ const bulkDeleteTestCasesInDB = (testCaseIds) => __awaiter(void 0, void 0, void 
     { $set: { isDeleted: true } } // Update status field
     );
 });
+const updateTestCaseInDB = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield testcase_model_1.TestCaseModel.findOneAndUpdate({ id }, { $set: updateData }, { new: true });
+    return result;
+});
 exports.TestCaseService = {
     createTestCaseIntoDB,
     getAllTestCasesFromDB,
@@ -49,5 +53,6 @@ exports.TestCaseService = {
     getSingleTestCaseFromDB,
     deleteTestCaseFromDB,
     bulkDeleteTestCasesInDB,
+    updateTestCaseInDB,
     updateTestCasesStatusInDB,
 };

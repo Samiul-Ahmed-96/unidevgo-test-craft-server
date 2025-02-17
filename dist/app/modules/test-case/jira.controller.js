@@ -14,25 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JiraController = void 0;
 const axios_1 = __importDefault(require("axios"));
-const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
-const JIRA_EMAIL = process.env.JIRA_EMAIL;
-const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
+// Jira Issue Creation
 const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
-        const { testCase, projectKey } = req.body; // Project key comes from the client side
-        if (!testCase || !projectKey) {
+        const { testCase, projectKey, jiraBaseUrl, jiraEmail, jiraApiToken } = req.body;
+        if (!testCase ||
+            !projectKey ||
+            !jiraBaseUrl ||
+            !jiraEmail ||
+            !jiraApiToken) {
             res.status(400).json({
                 success: false,
-                message: "Test case data and project key are required",
+                message: "Test case data, project key, Jira Base URL, Email, and API token are required.",
             });
             return;
         }
-        // Destructure optional default properties from the testCase object
         const { createdBy, testDescription, expectedResult, status, executedDate, updatedDate, } = testCase.defaultProperties || {};
-        // Set default title if testDescription is not provided
         const title = testDescription || "No title provided";
-        // Construct the description in ADF (Atlassian Document Format)
         const adfDescription = {
             type: "doc",
             version: 1,
@@ -47,12 +46,24 @@ const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function
                 },
             ],
         };
-        // Add additional properties to the description if available
+        const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            return (date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            }) +
+                " " +
+                date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }));
+        };
         const addPropertyToDescription = (label, value) => {
             if (value) {
+                const formattedValue = label.includes("Date")
+                    ? formatDate(value)
+                    : value;
                 adfDescription.content.push({
                     type: "paragraph",
-                    content: [{ type: "text", text: `${label}: ${value}` }],
+                    content: [{ type: "text", text: `${label}: ${formattedValue}` }],
                 });
             }
         };
@@ -61,7 +72,6 @@ const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function
         addPropertyToDescription("Status", status);
         addPropertyToDescription("Executed Date", executedDate);
         addPropertyToDescription("Updated Date", updatedDate);
-        // Add custom properties if they exist
         if (testCase.customProperties && testCase.customProperties.length > 0) {
             testCase.customProperties.forEach((property) => {
                 adfDescription.content.push({
@@ -75,7 +85,6 @@ const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function
                 });
             });
         }
-        // Jira issue data with the project key
         const jiraIssueData = {
             fields: {
                 project: { key: projectKey },
@@ -85,10 +94,8 @@ const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function
                 labels: ["Test-Craft-APP", "Test-Case"],
             },
         };
-        // Basic authentication setup
-        const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString("base64");
-        // Send the request to Jira API to create an issue
-        const jiraResponse = yield axios_1.default.post(`${JIRA_BASE_URL}/rest/api/3/issue`, jiraIssueData, {
+        const auth = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString("base64");
+        const jiraResponse = yield axios_1.default.post(`${jiraBaseUrl}/rest/api/3/issue`, jiraIssueData, {
             headers: {
                 Authorization: `Basic ${auth}`,
                 "Content-Type": "application/json",
@@ -109,32 +116,71 @@ const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     }
 });
-// Create a route to fetch Jira projects
+// Fetch Jira Projects (Dynamic User Authentication)
 const getJiraProjects = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
-        // Authentication
-        const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString("base64");
-        // Make the request to Jira API to fetch projects
-        const response = yield axios_1.default.get(`${JIRA_BASE_URL}/rest/api/3/project`, {
+        const { jiraBaseUrl, jiraEmail, jiraApiToken } = req.query;
+        if (!jiraBaseUrl || !jiraEmail || !jiraApiToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Jira Base URL, Email, and API Token are required.",
+            });
+        }
+        const auth = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString("base64");
+        const response = yield axios_1.default.get(`${jiraBaseUrl}/rest/api/3/project`, {
             headers: {
                 Authorization: `Basic ${auth}`,
                 "Content-Type": "application/json",
             },
         });
-        // Send the list of projects back to the client
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            data: response.data, // You can return the list of projects
+            data: response.data,
         });
     }
     catch (error) {
         console.error("Error fetching Jira projects:", ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Failed to fetch Jira projects",
             error: ((_b = error.response) === null || _b === void 0 ? void 0 : _b.data) || error.message,
         });
     }
 });
-exports.JiraController = { createJiraIssue, getJiraProjects };
+const fetchJiraFields = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        const { jiraBaseUrl, jiraEmail, jiraApiToken } = req.query;
+        if (!jiraBaseUrl || !jiraEmail || !jiraApiToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Jira Base URL, Email, and API Token are required.",
+            });
+        }
+        const auth = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString("base64");
+        const response = yield axios_1.default.get(`${jiraBaseUrl}/rest/api/3/field`, {
+            headers: {
+                Authorization: `Basic ${auth}`,
+                "Content-Type": "application/json",
+            },
+        });
+        return res.status(200).json({
+            success: true,
+            data: response.data,
+        });
+    }
+    catch (error) {
+        console.error("Error fetching Jira fields:", ((_a = error.response) === null || _a === void 0 ? void 0 : _a.data) || error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch Jira fields",
+            error: ((_b = error.response) === null || _b === void 0 ? void 0 : _b.data) || error.message,
+        });
+    }
+});
+exports.JiraController = {
+    createJiraIssue,
+    getJiraProjects,
+    fetchJiraFields,
+};

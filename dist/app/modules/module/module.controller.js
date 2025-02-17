@@ -94,6 +94,36 @@ const getSingleModule = (req, res) => __awaiter(void 0, void 0, void 0, function
         res.status(500).json({ success: false, message: "Server error", error });
     }
 });
+// Update only the module name
+const updateModuleName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { moduleId } = req.params;
+        const { name } = req.body;
+        console.log("ID", moduleId);
+        if (!moduleId || !name) {
+            res.status(400).json({
+                success: false,
+                message: "Module ID and new name are required",
+            });
+            return;
+        }
+        const result = yield module_service_1.ModuleService.updateModuleName(moduleId, name);
+        if (result.matchedCount === 0) {
+            res.status(404).json({
+                success: false,
+                message: "Module not found",
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            message: "Module name updated successfully",
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
 // Controller to delete (soft delete) a module
 const deleteModule = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -127,5 +157,6 @@ exports.ModuleControllers = {
     addSubmodule,
     getAllModules,
     getSingleModule,
+    updateModuleName,
     deleteModule,
 };
