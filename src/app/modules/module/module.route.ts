@@ -2,6 +2,7 @@ import express from "express";
 import { ModuleControllers } from "./module.controller";
 
 const router = express.Router();
+
 // Create Module
 router.post("/", ModuleControllers.createModule);
 
@@ -13,6 +14,9 @@ router.get("/", ModuleControllers.getAllModules);
 
 // Fetch a single module by moduleId
 router.get("/:moduleId", ModuleControllers.getSingleModule);
+
+// Update only the module name
+router.put("/:moduleId/name", ModuleControllers.updateModuleName);
 
 // Soft delete a module by moduleId
 router.delete("/:moduleId", ModuleControllers.deleteModule);

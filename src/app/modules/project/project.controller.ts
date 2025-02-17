@@ -125,11 +125,50 @@ const getSingleProject = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Controller to update an project's details
+const updateProject = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { projectId } = req.params;
+    const updateData = req.body;
+
+    // Check if update data is provided
+    if (!updateData) {
+      res.status(400).json({
+        success: false,
+        message: "No update data provided",
+      });
+      return;
+    }
+
+    const result = await ProjectService.updateProjectInDB(
+      projectId,
+      updateData
+    );
+
+    if (!result) {
+      res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Project updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.send(error);
+  }
+};
+
 // Export all controllers
 export const ProjectControllers = {
   createProject,
   getAllProjects,
   getSingleProject,
   getAllProjectByCompany,
+  updateProject,
   deleteProject,
 };

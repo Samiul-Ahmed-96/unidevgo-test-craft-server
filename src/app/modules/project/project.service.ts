@@ -26,10 +26,20 @@ const getSingleProjectFromDB = async (id: string) => {
   return result;
 };
 
+const updateProjectInDB = async (id: string, updateData: Partial<TProject>) => {
+  const result = await ProjectModel.findOneAndUpdate(
+    { id },
+    { $set: updateData },
+    { new: true }
+  );
+  return result;
+};
+
 export const ProjectService = {
   createProjectIntoDB,
   getAllProjectsFromDB,
   getAllModulesByCompanyFromDB,
   getSingleProjectFromDB,
+  updateProjectInDB,
   deleteProjectFromDB,
 };

@@ -135,16 +135,15 @@ const createJiraIssue = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Fetch Jira Projects (Dynamic User Authentication)
-const getJiraProjects = async (req: Request, res: Response): Promise<void> => {
+const getJiraProjects = async (req: Request, res: Response) => {
   try {
     const { jiraBaseUrl, jiraEmail, jiraApiToken } = req.query;
 
     if (!jiraBaseUrl || !jiraEmail || !jiraApiToken) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Jira Base URL, Email, and API Token are required.",
       });
-      return;
     }
 
     const auth = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString("base64");
@@ -156,7 +155,7 @@ const getJiraProjects = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: response.data,
     });
@@ -166,7 +165,7 @@ const getJiraProjects = async (req: Request, res: Response): Promise<void> => {
       error.response?.data || error.message
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch Jira projects",
       error: error.response?.data || error.message,
@@ -174,4 +173,46 @@ const getJiraProjects = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const JiraController = { createJiraIssue, getJiraProjects };
+const fetchJiraFields = async (req: Request, res: Response) => {
+  try {
+    const { jiraBaseUrl, jiraEmail, jiraApiToken } = req.query;
+
+    if (!jiraBaseUrl || !jiraEmail || !jiraApiToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Jira Base URL, Email, and API Token are required.",
+      });
+    }
+
+    const auth = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString("base64");
+
+    const response = await axios.get(`${jiraBaseUrl}/rest/api/3/field`, {
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: response.data,
+    });
+  } catch (error: any) {
+    console.error(
+      "Error fetching Jira fields:",
+      error.response?.data || error.message
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch Jira fields",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
+export const JiraController = {
+  createJiraIssue,
+  getJiraProjects,
+  fetchJiraFields,
+};

@@ -32,7 +32,7 @@ app.use(
 app.use(express.json());
 
 // Serve uploaded files statically
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Application routes
 app.use("/api/v1/companies", CompanyRoutes);

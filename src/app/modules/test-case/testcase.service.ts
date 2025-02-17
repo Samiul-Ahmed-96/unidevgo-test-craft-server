@@ -44,6 +44,18 @@ const bulkDeleteTestCasesInDB = async (testCaseIds: string[]) => {
   );
 };
 
+const updateTestCaseInDB = async (
+  id: string,
+  updateData: Partial<TTestCase>
+) => {
+  const result = await TestCaseModel.findOneAndUpdate(
+    { id },
+    { $set: updateData },
+    { new: true }
+  );
+  return result;
+};
+
 export const TestCaseService = {
   createTestCaseIntoDB,
   getAllTestCasesFromDB,
@@ -51,5 +63,6 @@ export const TestCaseService = {
   getSingleTestCaseFromDB,
   deleteTestCaseFromDB,
   bulkDeleteTestCasesInDB,
+  updateTestCaseInDB,
   updateTestCasesStatusInDB,
 };

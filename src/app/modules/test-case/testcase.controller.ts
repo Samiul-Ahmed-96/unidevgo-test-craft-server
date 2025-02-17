@@ -12,7 +12,12 @@ const createTestCase = async (req: Request, res: Response): Promise<void> => {
     const validatedData =
       testCaseValidation.TestCaseValidationSchema.parse(testCase);
 
-    // If an attachment URL is provided, add it to customProperties
+    // Ensure customProperties exists
+    if (!validatedData.customProperties) {
+      validatedData.customProperties = [];
+    }
+
+    // If an attachment is uploaded, add it to customProperties
     if (req.file) {
       validatedData.customProperties.push({
         name: "Attachment",
@@ -215,6 +220,44 @@ const bulkDeleteTestCase = async (
   }
 };
 
+// Controller to update an project's details
+const updateTestCase = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { testCaseId } = req.params;
+    const updateData = req.body;
+
+    // Check if update data is provided
+    if (!updateData) {
+      res.status(400).json({
+        success: false,
+        message: "No update data provided",
+      });
+      return;
+    }
+
+    const result = await TestCaseService.updateTestCaseInDB(
+      testCaseId,
+      updateData
+    );
+
+    if (!result) {
+      res.status(404).json({
+        success: false,
+        message: "Test case not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Test case updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    res.send(error);
+  }
+};
+
 // Export all controllers
 export const TestCaseControllers = {
   createTestCase,
@@ -222,6 +265,7 @@ export const TestCaseControllers = {
   getTestCasesByModule,
   updateTestCasesStatus,
   getSingleTestCase,
+  updateTestCase,
   deleteTestCase,
   bulkDeleteTestCase,
 };

@@ -96,6 +96,41 @@ const getSingleModule = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Update only the module name
+const updateModuleName = async (req: Request, res: Response) => {
+  try {
+    const { moduleId } = req.params;
+    const { name } = req.body;
+
+    console.log("ID", moduleId);
+
+    if (!moduleId || !name) {
+      res.status(400).json({
+        success: false,
+        message: "Module ID and new name are required",
+      });
+      return;
+    }
+
+    const result = await ModuleService.updateModuleName(moduleId, name);
+
+    if (result.matchedCount === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Module not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Module name updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
+  }
+};
+
 // Controller to delete (soft delete) a module
 const deleteModule = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -133,5 +168,6 @@ export const ModuleControllers = {
   addSubmodule,
   getAllModules,
   getSingleModule,
+  updateModuleName,
   deleteModule,
 };

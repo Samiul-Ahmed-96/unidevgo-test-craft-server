@@ -1,27 +1,26 @@
-import { Request } from "express";
+import fs from "fs";
 import multer from "multer";
 import path from "path";
+
+// Ensure the uploads directory exists
+const uploadDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Set storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Ensure this folder exists or create it dynamically
+    cb(null, uploadDir); // Save files in the 'uploads/' folder
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    cb(null, uniqueSuffix + path.extname(file.originalname)); // Preserve file extension
   },
 });
 
-// File filter to allow only specific file types
-const fileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
-  const allowedTypes = ["image/png", "image/jpeg", "application/pdf"];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Invalid file type. Only PNG, JPEG, and PDF allowed."));
-  }
-};
+// No file filter - allowing all types of files
+const upload = multer({ storage });
 
-// Configure Multer
-export const upload = multer({ storage, fileFilter });
+export { upload };

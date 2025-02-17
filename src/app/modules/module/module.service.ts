@@ -26,6 +26,11 @@ const getSingleModuleFromDB = async (id: string) => {
   return await ModuleModel.findOne({ id });
 };
 
+// Update only the module name
+const updateModuleName = async (id: string, newName: string) => {
+  return await ModuleModel.updateOne({ id }, { $set: { name: newName } });
+};
+
 // Soft delete a module
 const deleteModuleFromDB = async (id: string) => {
   return await ModuleModel.updateOne({ id }, { isDeleted: true });
@@ -36,5 +41,6 @@ export const ModuleService = {
   addSubmoduleToModule,
   getAllModulesFromDB,
   getSingleModuleFromDB,
+  updateModuleName,
   deleteModuleFromDB,
 };

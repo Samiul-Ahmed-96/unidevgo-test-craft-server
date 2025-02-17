@@ -46,6 +46,14 @@ router.get("/get-jira-projects", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error", error });
   }
 });
+// Fetch Jira Fields Route
+router.get("/get-jira-fields", async (req, res) => {
+  try {
+    await JiraController.fetchJiraFields(req, res); // Call the controller
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
+  }
+});
 
 //Test Case Routes
 router.get("/all", TestCaseControllers.getAllTestCases);
@@ -54,6 +62,7 @@ router.get("/", TestCaseControllers.getTestCasesByModule);
 router.put("/update-status", TestCaseControllers.updateTestCasesStatus);
 router.put("/delete-test-case", TestCaseControllers.bulkDeleteTestCase);
 router.get("/:testCaseId", TestCaseControllers.getSingleTestCase);
+router.put("/:testCaseId", TestCaseControllers.updateTestCase);
 router.post("/create-test-case", TestCaseControllers.createTestCase);
 router.delete("/:testCaseId", TestCaseControllers.deleteTestCase);
 
