@@ -14,4 +14,6 @@ router.delete("/:companyId", company_controller_1.CompanyControllers.deleteCompa
 router.put("/:companyId", company_controller_1.CompanyControllers.updateCompany);
 router.post("/login", company_controller_1.CompanyControllers.loginCompany);
 router.put("/update-password/:companyId", company_controller_1.CompanyControllers.updatePassword);
+router.post("/request-password-reset", company_controller_1.CompanyControllers.requestPasswordReset);
+router.post("/reset-password", company_controller_1.CompanyControllers.resetPassword);
 exports.CompanyRoutes = router;

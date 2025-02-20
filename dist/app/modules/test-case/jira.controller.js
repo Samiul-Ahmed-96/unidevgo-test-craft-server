@@ -74,15 +74,42 @@ const createJiraIssue = (req, res) => __awaiter(void 0, void 0, void 0, function
         addPropertyToDescription("Updated Date", updatedDate);
         if (testCase.customProperties && testCase.customProperties.length > 0) {
             testCase.customProperties.forEach((property) => {
-                adfDescription.content.push({
-                    type: "paragraph",
-                    content: [
-                        {
-                            type: "text",
-                            text: `Custom Property - Name: ${property.name} | Value: ${property.value} | Type: (${property.type})`,
-                        },
-                    ],
-                });
+                if (property.type === "attachment") {
+                    // If the custom property type is "attachment", render the attachment properly
+                    adfDescription.content.push({
+                        type: "paragraph",
+                        content: [
+                            {
+                                type: "text",
+                                text: `Custom Property - Name: ${property.name} | Type: ${property.type} | Attachment: `,
+                            },
+                            {
+                                type: "link",
+                                attrs: {
+                                    href: property.value,
+                                },
+                                content: [
+                                    {
+                                        type: "text",
+                                        text: "Download Attachment",
+                                    },
+                                ],
+                            },
+                        ],
+                    });
+                }
+                else {
+                    // For other custom property types, render as text
+                    adfDescription.content.push({
+                        type: "paragraph",
+                        content: [
+                            {
+                                type: "text",
+                                text: `Custom Property - Name: ${property.name} | Value: ${property.value} | Type: ${property.type}`,
+                            },
+                        ],
+                    });
+                }
             });
         }
         const jiraIssueData = {

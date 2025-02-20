@@ -11,4 +11,6 @@ export type TCompany = {
   createdAt?: Date;
   updatedAt?: Date;
   isDeleted: boolean;
+  passwordResetToken: string;
+  passwordResetExpires: Date;
 };

@@ -27,9 +27,9 @@ const CompanySchema = new mongoose_1.Schema({
     address: { type: String, required: true },
     contactNumber: { type: String, required: true },
     isDeleted: { type: Boolean, default: false },
-}, {
-    timestamps: true,
-});
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
+}, { timestamps: true });
 // Pre save middleware hook
 CompanySchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {

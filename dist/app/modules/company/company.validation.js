@@ -18,6 +18,8 @@ const CompanyValidationSchema = zod_1.z.object({
         .string()
         .min(10, "Contact number must be at least 10 characters long"),
     isDeleted: zod_1.z.boolean().optional().default(false),
+    passwordResetToken: zod_1.z.string().optional(),
+    passwordResetExpires: zod_1.z.date().optional(),
 });
 exports.CompanyValidation = {
     CompanyValidationSchema,

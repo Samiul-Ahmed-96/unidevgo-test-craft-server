@@ -27,7 +27,7 @@ const createTestCase = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Create test case
-    const result = await TestCaseService.createTestCaseIntoDB(validatedData);
+    const result = await TestCaseService.createTestCaseIntoDB(validatedData); //got the error here in validateData
 
     res.status(201).json({
       success: true,
@@ -88,10 +88,12 @@ const getTestCasesByModule = async (
 
     const result = await TestCaseService.getTestCasesByModuleFromDB(moduleId);
 
+    const reverseData = result.reverse();
+
     res.status(200).json({
       success: true,
       message: "Modules retrieved successfully",
-      data: result,
+      data: reverseData,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });

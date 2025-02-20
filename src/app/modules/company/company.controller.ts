@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { ZodError } from "zod";
 import { CompanyServices } from "./company.service";
-import { CompanyValidation } from "./company.validation";
 
 // Utility function for centralized error handling
 const handleError = (
@@ -30,12 +30,8 @@ const createCompany = async (req: Request, res: Response): Promise<void> => {
   try {
     const { company: companyData } = req.body;
 
-    // Validate input using zod schema
-    const zodParseData =
-      CompanyValidation.CompanyValidationSchema.parse(companyData);
-
     // Save company to the database
-    const result = await CompanyServices.createCompanyIntoDB(zodParseData);
+    const result = await CompanyServices.createCompanyIntoDB(companyData);
 
     res.status(201).json({
       success: true,
@@ -187,8 +183,9 @@ const loginCompany = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Verify password
+    // Verify password with bcrypt
     const isPasswordValid = await bcrypt.compare(password, company.password);
+    console.log("Password Match:", isPasswordValid);
 
     if (!isPasswordValid) {
       res.status(401).json({
@@ -227,6 +224,7 @@ const loginCompany = async (req: Request, res: Response): Promise<void> => {
       role: "company",
     });
   } catch (error) {
+    console.error("Error during login:", error);
     handleError(res, error);
   }
 };
@@ -293,6 +291,44 @@ const updatePassword = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// Request Password Reset Token
+export const requestPasswordReset = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    await CompanyServices.generatePasswordResetToken(email);
+    res.json({ message: "Reset token sent to email" });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Controller to reset the company's password
+const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, newPassword } = req.body;
+
+  // Hash the token and compare
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const company = await CompanyServices.getCompanyByResetToken(hashedToken);
+
+  if (!company || company.passwordResetExpires < new Date()) {
+    res.status(400).json({ message: "Invalid or expired token" });
+    return;
+  }
+
+  const result = await CompanyServices.updateCompanyPasswordInDB(
+    company.id,
+    newPassword
+  );
+
+  if (!result) {
+    res.status(500).json({ message: "Failed to reset password" });
+    return;
+  }
+
+  res.status(200).json({ message: "Password reset successfully" });
+};
+
 // Export all controllers
 export const CompanyControllers = {
   createCompany,
@@ -302,4 +338,6 @@ export const CompanyControllers = {
   updateCompany,
   loginCompany,
   updatePassword,
+  requestPasswordReset,
+  resetPassword,
 };

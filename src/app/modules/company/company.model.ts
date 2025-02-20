@@ -15,10 +15,10 @@ const CompanySchema = new Schema<TCompany>(
     address: { type: String, required: true },
     contactNumber: { type: String, required: true },
     isDeleted: { type: Boolean, default: false },
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 // Pre save middleware hook

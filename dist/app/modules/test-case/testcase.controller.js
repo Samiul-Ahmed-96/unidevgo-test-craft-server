@@ -31,7 +31,7 @@ const createTestCase = (req, res) => __awaiter(void 0, void 0, void 0, function*
             });
         }
         // Create test case
-        const result = yield testcase_service_1.TestCaseService.createTestCaseIntoDB(validatedData);
+        const result = yield testcase_service_1.TestCaseService.createTestCaseIntoDB(validatedData); //got the error here in validateData
         res.status(201).json({
             success: true,
             message: "Test Case Added successfully",
@@ -83,10 +83,11 @@ const getTestCasesByModule = (req, res) => __awaiter(void 0, void 0, void 0, fun
             return;
         }
         const result = yield testcase_service_1.TestCaseService.getTestCasesByModuleFromDB(moduleId);
+        const reverseData = result.reverse();
         res.status(200).json({
             success: true,
             message: "Modules retrieved successfully",
-            data: result,
+            data: reverseData,
         });
     }
     catch (error) {
