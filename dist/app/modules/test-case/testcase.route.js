@@ -19,25 +19,25 @@ const fileUpload_service_1 = require("./fileUpload.service");
 const jira_controller_1 = require("./jira.controller");
 const testcase_controller_1 = require("./testcase.controller");
 const router = express_1.default.Router();
-router.post("/upload-attachment", fileUpload_service_1.upload.single("file"), (req, res) => {
+// Upload File Route
+router.post("/upload-attachment", fileUpload_service_1.upload.single("file"), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.file) {
             res.status(400).json({ success: false, message: "No file uploaded." });
             return;
         }
-        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+        const fileUrl = req.file.path; // Ensure fileUrl is properly typed
         res.status(200).json({
             success: true,
-            message: "File uploaded successfully",
+            message: "File uploaded and stored successfully",
             fileUrl,
         });
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ success: false, message: "Server error", error: error });
+        console.error("Upload Error:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
     }
-});
+}));
 // Jira routes with async handling
 router.post("/create-jira-issue", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

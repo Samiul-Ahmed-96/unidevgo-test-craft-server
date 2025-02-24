@@ -1,27 +1,34 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.upload = void 0;
-const fs_1 = __importDefault(require("fs"));
 const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
-// Ensure the uploads directory exists
-const uploadDir = path_1.default.join(process.cwd(), "uploads");
-if (!fs_1.default.existsSync(uploadDir)) {
-    fs_1.default.mkdirSync(uploadDir, { recursive: true });
-}
-// Set storage configuration
-const storage = multer_1.default.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir); // Save files in the 'uploads/' folder
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(null, uniqueSuffix + path_1.default.extname(file.originalname)); // Preserve file extension
-    },
+const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
+const cloudinaryConfig_1 = __importDefault(require("../../utils/cloudinaryConfig"));
+// Configure Cloudinary Storage
+const storage = new multer_storage_cloudinary_1.CloudinaryStorage({
+    cloudinary: cloudinaryConfig_1.default,
+    params: (req, file) => __awaiter(void 0, void 0, void 0, function* () {
+        let folder = "uploads"; // Default folder
+        let resource_type = "auto"; // Automatically determine file type
+        return {
+            folder: folder,
+            format: file.originalname.split(".").pop(), // Keep original file format
+            resource_type: resource_type,
+        };
+    }),
 });
-// No file filter - allowing all types of files
+// Initialize Multer with Cloudinary Storage
 const upload = (0, multer_1.default)({ storage });
 exports.upload = upload;

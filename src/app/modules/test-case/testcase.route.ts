@@ -1,5 +1,5 @@
 // routes/testCase.routes.ts
-import express from "express";
+import express, { Request, Response } from "express";
 import { upload } from "./fileUpload.service";
 import { JiraController } from "./jira.controller";
 
@@ -7,28 +7,30 @@ import { TestCaseControllers } from "./testcase.controller";
 
 const router = express.Router();
 
-router.post("/upload-attachment", upload.single("file"), (req, res): void => {
-  try {
-    if (!req.file) {
-      res.status(400).json({ success: false, message: "No file uploaded." });
-      return;
+// Upload File Route
+router.post(
+  "/upload-attachment",
+  upload.single("file"),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.file) {
+        res.status(400).json({ success: false, message: "No file uploaded." });
+        return;
+      }
+
+      const fileUrl = (req.file as any).path; // Ensure fileUrl is properly typed
+
+      res.status(200).json({
+        success: true,
+        message: "File uploaded and stored successfully",
+        fileUrl,
+      });
+    } catch (error) {
+      console.error("Upload Error:", error);
+      res.status(500).json({ success: false, message: "Server error", error });
     }
-
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${
-      req.file.filename
-    }`;
-
-    res.status(200).json({
-      success: true,
-      message: "File uploaded successfully",
-      fileUrl,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error });
   }
-});
+);
 
 // Jira routes with async handling
 router.post("/create-jira-issue", async (req, res) => {
