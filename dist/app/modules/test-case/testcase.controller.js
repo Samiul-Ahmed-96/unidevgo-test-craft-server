@@ -30,8 +30,11 @@ const createTestCase = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 value: `/uploads/${req.file.filename}`,
             });
         }
+        // Ensure all customProperties have a value (cannot be null or undefined)
+        validatedData.customProperties = validatedData.customProperties.map((prop) => (Object.assign(Object.assign({}, prop), { value: prop.value || "" })));
         // Create test case
-        const result = yield testcase_service_1.TestCaseService.createTestCaseIntoDB(validatedData); //got the error here in validateData
+        // Cast validatedData to the expected type to ensure compatibility with the service
+        const result = yield testcase_service_1.TestCaseService.createTestCaseIntoDB(validatedData); //explicit type assertion to bypass the type check
         res.status(201).json({
             success: true,
             message: "Test Case Added successfully",

@@ -18,6 +18,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const zod_1 = require("zod");
 const company_service_1 = require("./company.service");
+const company_validation_1 = require("./company.validation");
 // Utility function for centralized error handling
 const handleError = (res, error, statusCode = 500, defaultMessage = "Something went wrong") => {
     console.error("Error:", error); // Log the error for debugging
@@ -34,8 +35,9 @@ const handleError = (res, error, statusCode = 500, defaultMessage = "Something w
 const createCompany = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { company: companyData } = req.body;
+        const zodParsedData = company_validation_1.CompanyValidation.CompanyValidationSchema.parse(companyData);
         // Save company to the database
-        const result = yield company_service_1.CompanyServices.createCompanyIntoDB(companyData);
+        const result = yield company_service_1.CompanyServices.createCompanyIntoDB(Object.assign(Object.assign({}, zodParsedData), { passwordResetToken: zodParsedData.passwordResetToken || "", passwordResetExpires: zodParsedData.passwordResetExpires || new Date() }));
         res.status(201).json({
             success: true,
             message: "Company created successfully",

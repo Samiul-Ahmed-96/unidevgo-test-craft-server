@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { ZodError } from "zod";
 import { CompanyServices } from "./company.service";
+import { CompanyValidation } from "./company.validation";
 
 // Utility function for centralized error handling
 const handleError = (
@@ -29,9 +30,14 @@ const handleError = (
 const createCompany = async (req: Request, res: Response): Promise<void> => {
   try {
     const { company: companyData } = req.body;
-
+    const zodParsedData =
+      CompanyValidation.CompanyValidationSchema.parse(companyData);
     // Save company to the database
-    const result = await CompanyServices.createCompanyIntoDB(companyData);
+    const result = await CompanyServices.createCompanyIntoDB({
+      ...zodParsedData,
+      passwordResetToken: zodParsedData.passwordResetToken || "",
+      passwordResetExpires: zodParsedData.passwordResetExpires || new Date(),
+    });
 
     res.status(201).json({
       success: true,
