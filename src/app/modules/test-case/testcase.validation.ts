@@ -18,6 +18,7 @@ export const DefaultPropertiesValidationSchema = z.object({
   testDescription: z.string().min(1, "Test Description is required"),
   expectedResult: z.string().min(1, "Expected Result is required"),
   status: z.enum(["Passed", "Failed", "Blocked", "Skipped", "Not Yet Tested"]),
+  steps: z.string().optional(),
   executedDate: z
     .union([z.string(), z.date()])
     .transform((val) => new Date(val))
@@ -40,6 +41,7 @@ export const TestCaseValidationSchema = z.object({
     status: "Not Yet Tested",
   }),
   isDeleted: z.boolean().optional().default(false),
+  isBugReportAdded: z.boolean().optional().default(false),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });

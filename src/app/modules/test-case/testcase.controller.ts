@@ -7,6 +7,7 @@ import { testCaseValidation } from "./testcase.validation";
 const createTestCase = async (req: Request, res: Response): Promise<void> => {
   try {
     let { testCase } = req.body;
+    console.log("testCase", testCase);
 
     // Validate test case data using Zod
     const validatedData =
@@ -129,6 +130,34 @@ const deleteTestCase = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({
       success: true,
       message: "Test Case deleted successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+// Controller to delete a test case by ID
+const updateBugField = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { testCaseId } = req.params;
+
+    const result = await TestCaseService.updateBugFieldInDB(testCaseId);
+
+    if (!result || result.matchedCount === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Test Case not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bug field update successfully",
       data: result,
     });
   } catch (error: any) {
@@ -276,6 +305,7 @@ export const TestCaseControllers = {
   createTestCase,
   getAllTestCases,
   getTestCasesByModule,
+  updateBugField,
   updateTestCasesStatus,
   getSingleTestCase,
   updateTestCase,

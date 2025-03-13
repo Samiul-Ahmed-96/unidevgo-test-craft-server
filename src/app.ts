@@ -12,6 +12,7 @@ const app: Application = express();
 const allowedOrigins = [
   "http://localhost:5173", // Localhost URL for development
   "https://testcraft.unidevgo.com", // Production URL
+  "http://209.38.153.224:5173", // Production URL without trailing slash
 ];
 
 app.use(
@@ -27,6 +28,9 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   })
 );
+
+// Explicitly handle OPTIONS requests for preflight
+app.options("*", cors());
 
 // Parsers
 app.use(express.json());

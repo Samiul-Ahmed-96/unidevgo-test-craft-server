@@ -67,5 +67,6 @@ router.get("/:testCaseId", TestCaseControllers.getSingleTestCase);
 router.put("/:testCaseId", TestCaseControllers.updateTestCase);
 router.post("/create-test-case", TestCaseControllers.createTestCase);
 router.delete("/:testCaseId", TestCaseControllers.deleteTestCase);
+router.put("/bug-field/:testCaseId", TestCaseControllers.updateBugField);
 
 export const TestCaseRoutes = router;

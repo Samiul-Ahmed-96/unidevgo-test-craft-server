@@ -29,6 +29,7 @@ const DefaultPropertiesSchema = new Schema({
     default: "Not Yet Tested",
   },
   executedDate: { type: Date },
+  steps: { type: String },
   updatedDate: { type: Date },
   considerAsBug: { type: Boolean, default: false },
 });
@@ -40,6 +41,7 @@ const TestCaseSchema = new Schema<TTestCase>(
     customProperties: [CustomPropertySchema],
     defaultProperties: DefaultPropertiesSchema,
     isDeleted: { type: Boolean, default: false },
+    isBugReportAdded: { type: Boolean, default: false },
   },
   {
     timestamps: true,

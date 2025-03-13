@@ -18,6 +18,7 @@ export type TDefaultProperties = {
   expectedResult: string;
   status: "Passed" | "Failed" | "Blocked" | "Skipped" | "Not Yet Tested";
   executedDate: string; // Use `Date` if parsing is required
+  steps: "richText";
   updatedDate: string;
   considerAsBug: boolean;
 };
@@ -28,4 +29,5 @@ export type TTestCase = {
   customProperties: TCustomProperty[];
   defaultProperties: TDefaultProperties;
   isDeleted: boolean;
+  isBugReportAdded: boolean;
 };

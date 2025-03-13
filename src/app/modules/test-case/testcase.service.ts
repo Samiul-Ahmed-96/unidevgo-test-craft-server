@@ -22,6 +22,13 @@ const deleteTestCaseFromDB = async (id: string) => {
   const result = await TestCaseModel.updateOne({ id }, { isDeleted: true });
   return result;
 };
+const updateBugFieldInDB = async (id: string) => {
+  const result = await TestCaseModel.updateOne(
+    { id },
+    { isBugReportAdded: true }
+  );
+  return result;
+};
 
 const getSingleTestCaseFromDB = async (id: string) => {
   const result = await TestCaseModel.findOne({ id });
@@ -63,6 +70,7 @@ export const TestCaseService = {
   getSingleTestCaseFromDB,
   deleteTestCaseFromDB,
   bulkDeleteTestCasesInDB,
+  updateBugFieldInDB,
   updateTestCaseInDB,
   updateTestCasesStatusInDB,
 };
